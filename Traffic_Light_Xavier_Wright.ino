@@ -1,7 +1,8 @@
 /*
-Project 5 - Traffic Lights
+Project 6 - Traffic Lights
 Created by Xavier Wright
-Date 3/28/2025
+Date 4/15/2025
+Description - This code simulates a traffic light intersection with functions to increase readabillity 
 
 
 */
@@ -19,10 +20,8 @@ Date 3/28/2025
 #define yellowBlinkTime 500  // defines a time for the yellow led to blink
 
 boolean trafficWest = true;  // west = true, east = false
-int flowTime = 10000;        //
+int flowTime = 10000;
 int changeDelay = 2000;
-
-
 
 void setup() {
   // sets the input and output
@@ -51,25 +50,12 @@ void loop() {
     {
       trafficWest = true;  // sets traficWest to true
       delay(flowTime);
-      digitalWrite(eastGreen, LOW);  // turns off the east green traffic light
+      changeGreenToRed(eastGreen, eastYellow, eastRed);// simulates a traffic intersection changing from green to red
+      delay(changeDelay);  // waits 2 seconds
 
-      digitalWrite(eastYellow, HIGH);  // turns on the east yellow traffic light
-      delay(changeDelay);              // waits 2 seconds
-      digitalWrite(eastYellow, LOW);   // turns off the east yellow traffic light
-      digitalWrite(eastRed, HIGH);     // turns on the east red light
-      delay(changeDelay);              // waits 2 seconds
-
-      // this loop blinks the west yellow lighr 5 times
-      for (int a = 0; a < 5; a++) {
-        digitalWrite(westYellow, LOW);
-        delay(yellowBlinkTime);
-        digitalWrite(westYellow, HIGH);
-        delay(yellowBlinkTime);
-      }
-
-      digitalWrite(westYellow, LOW);  // turns off west yellow
-      digitalWrite(westRed, LOW);     // turns off west red
-      digitalWrite(westGreen, HIGH);  // turns on west green
+      changeYellow(westYellow);// blinks the west yellow light 5 time
+  
+      changeDirection(westGreen, westYellow, westRed);//simulates a traffic intersection changing direction
     }
   }
 
@@ -79,24 +65,41 @@ void loop() {
     {
       trafficWest = false;  // sets trafficWest to false
       delay(flowTime);
-      digitalWrite(westGreen, LOW);    // turns west green off
-      digitalWrite(westYellow, HIGH);  // turns west yellow on
-      delay(changeDelay);              //
-      digitalWrite(westYellow, LOW)    // turns west yellow off
-        digitalWrite(westRed, HIGH);   //
+      changeGreenToRed(westGreen, westYellow, westRed);// simulates a traffic intersection changing from green to red
       delay(changeDelay);
+      
+      changeYellow(eastYellow);// blinks the east yellow light 5 time
 
-      // blinks the east yellow light 5 times
-      for (int a = 0; a < 5; a++) {
-        digitalWrite(eastYellow, LOW);
-        delay(yellowBlinkTime);
-        digitalWrite(eastYellow, HIGH);
-        delay(yellowBlinkTime);
-      }
-
-      digitalWrite(eastYellow, LOW);  // turns off east yellow
-      digitalWrite(eastRed, LOW);     // turns off east red
-      digitalWrite(eastGreen, HIGH);  // turns east red
+      changeDirection(eastGreen, eastYellow, eastRed);//simulates a traffic intersection changing direction
     }
+  }
+}
+
+//
+void changeGreenToRed(int Green, int Yellow, int Red) {
+
+  digitalWrite(Green, LOW);  // turns off the green 
+  digitalWrite(Yellow, HIGH);  // turns on the yellow 
+  delay(changeDelay);          // waits 2 seconds
+
+  digitalWrite(Yellow, LOW);   // turns off the yellow 
+  digitalWrite(Red, HIGH);
+}
+
+void changeDirection(int green, int yellow, int red) {
+
+  digitalWrite(yellow, LOW);  // turns off yellow
+  digitalWrite(red, LOW);     // turns off red
+  digitalWrite(green, HIGH);  // turns on green
+}
+
+void changeYellow(int yellowLight) {
+
+// blinks yellow five times
+  for (int a = 0; a < 5; a++) {
+    digitalWrite(yellowLight, LOW);// turns off yellow
+    delay(yellowBlinkTime); // waits half a second
+    digitalWrite(yellowLight, HIGH); // turns on yellow
+    delay(yellowBlinkTime);
   }
 }
