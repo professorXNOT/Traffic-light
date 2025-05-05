@@ -1,0 +1,174 @@
+/*
+Project 6 - Traffic Lights
+Created by Xavier Wright
+Date 4/15/2025
+Description - This code simulates a traffic light intersection with functions to increase readabillity 
+it has a pedestrian light causes the intersections to turn red and the pedestrian lights were blue
+
+*/
+// assigns the pins
+#define westButton 5
+#define eastButton 13
+#define westRed 4
+#define westYellow 3
+#define westGreen 2
+#define eastRed 12
+#define eastYellow 11
+#define eastGreen 10
+#define pedButton 6
+#define westPedLight 7
+#define eastPedLight 8
+#define ambulanceWest 9
+#define ambulanceEast 1
+
+
+#define yellowBlinkTime 500  // defines a time for the yellow led to blink
+
+boolean trafficWest = true;  // west = true, east = false
+int flowTime = 1000;
+int changeDelay = 1000;
+
+void setup() {
+  // sets the input and output
+  pinMode(ambulanceWest, INPUT);
+  pinMode(ambulanceEast, INPUT);
+  pinMode(pedButton, INPUT);
+  pinMode(westButton, INPUT);
+  pinMode(eastButton, INPUT);
+  pinMode(westRed, OUTPUT);
+  pinMode(westYellow, OUTPUT);
+  pinMode(westGreen, OUTPUT);
+  pinMode(eastRed, OUTPUT);
+  pinMode(eastYellow, OUTPUT);
+  pinMode(eastGreen, OUTPUT);
+
+  // sets the starting conditions of the lights
+  digitalWrite(westRed, LOW);
+  digitalWrite(westYellow, LOW);
+  digitalWrite(westGreen, HIGH);
+  digitalWrite(eastRed, HIGH);
+  digitalWrite(eastYellow, LOW);
+  digitalWrite(eastGreen, LOW);
+  digitalWrite(westPedLight, LOW);
+  digitalWrite(eastPedLight, LOW);
+}
+
+void loop() {
+
+  // if the pedButton is pressed the pedestrian lights turn on
+  if (digitalRead(pedButton) == HIGH) {
+
+    // if trafficWest is true the west lights are changed to red and the pedestrian lights turn
+    if (trafficWest == true) {
+      changeGreenToRed(westGreen, westYellow, westRed);
+
+      pedCrossing(eastPedLight, westPedLight);
+      changeDirection(westGreen, westYellow, westRed);
+
+    }
+    // if trafficWest is not true the east lights are changed to red and the pedestrian lights turn on
+    else {
+      changeGreenToRed(eastGreen, eastYellow, eastRed);
+
+      pedCrossing(eastPedLight, westPedLight);
+      changeDirection(eastGreen, eastYellow, eastRed);
+    }
+  }
+
+//When the west ambulance button is pressed it turns on the west green and east red 
+  if (digitalRead(ambulanceWest) == HIGH) {
+    digitalWrite(westRed, LOW);
+    digitalWrite(eastYellow, LOW);
+    digitalWrite(eastGreen, LOW);
+    digitalWrite(eastRed, HIGH);
+    digitalWrite(westGreen, HIGH);
+    delay(changeDelay);
+    digitalWrite(westGreen, LOW);
+    changeDirection(eastGreen, eastYellow, eastRed);
+    digitalWrite(westRed, HIGH);
+  }
+
+//When the east ambulance button is pressed it turns on the west yellow and east red
+  if (digitalRead(ambulanceEast) == HIGH) {
+    digitalWrite(eastRed, LOW);
+    digitalWrite(westYellow, LOW);
+    digitalWrite(westGreen, LOW);
+    digitalWrite(westRed, HIGH);
+    digitalWrite(eastGreen, HIGH);
+    delay(changeDelay);
+    digitalWrite(eastGreen, LOW);
+    changeDirection(westGreen, westYellow, westRed);
+    digitalWrite(eastRed, HIGH);
+  }
+  if (digitalRead(westButton) == HIGH)  // reads the input if the button if it is pressed runs the code below
+  {
+
+    if (trafficWest != true)  // trafficWest is initially true so this code will not run the first time around
+    {
+      trafficWest = true;  // sets traficWest to true
+      delay(flowTime);
+      changeGreenToRed(eastGreen, eastYellow, eastRed);  // simulates a traffic intersection changing from green to red
+      delay(changeDelay);                                // waits 2 seconds
+
+      changeYellow(westYellow);  // blinks the west yellow light 5 time
+
+      changeDirection(westGreen, westYellow, westRed);  //simulates a traffic intersection changing direction
+    }
+  }
+
+  if (digitalRead(eastButton) == HIGH)  // check if button is pressed
+  {
+
+    if (trafficWest == true)  // since trafficWest is initially true this code will run
+    {
+      trafficWest = false;  // sets trafficWest to false
+      delay(flowTime);
+      changeGreenToRed(westGreen, westYellow, westRed);  // simulates a traffic intersection changing from green to red
+      delay(changeDelay);
+
+      changeYellow(eastYellow);  // blinks the east yellow light 5 time
+
+      changeDirection(eastGreen, eastYellow, eastRed);  //simulates a traffic intersection changing direction
+    }
+  }
+}
+//changes the lights to red
+void changeGreenToRed(int Green, int Yellow, int Red) {
+
+  digitalWrite(Green, LOW);    // turns off the green
+  digitalWrite(Yellow, HIGH);  // turns on the yellow
+  delay(changeDelay);          // waits 2 seconds
+
+  digitalWrite(Yellow, LOW);  // turns off the yellow
+  digitalWrite(Red, HIGH);
+}
+
+//switches the green light on turning everything low
+void changeDirection(int green, int yellow, int red) {
+
+  digitalWrite(yellow, LOW);  // turns off yellow
+  digitalWrite(red, LOW);     // turns off red
+  digitalWrite(green, HIGH);  // turns on green
+}
+
+// blinks the yellow light when it is changing
+void changeYellow(int yellowLight) {
+
+  // blinks yellow five times
+  for (int a = 0; a < 5; a++) {
+    digitalWrite(yellowLight, LOW);   // turns off yellow
+    delay(yellowBlinkTime);           // waits half a second
+    digitalWrite(yellowLight, HIGH);  // turns on yellow
+    delay(yellowBlinkTime);
+  }
+}
+
+// changes the ped lights when the button is pressed
+void pedCrossing(int lightEPed, int lightWPed) {
+  digitalWrite(lightEPed, HIGH);  // sets the Ped lights to high
+  digitalWrite(lightWPed, HIGH);
+  delay(flowTime);
+  digitalWrite(lightEPed, LOW);
+  digitalWrite(lightWPed, LOW);
+  // sets the ped lights to low
+}
